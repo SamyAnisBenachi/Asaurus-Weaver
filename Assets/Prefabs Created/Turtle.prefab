@@ -1087,6 +1087,7 @@ GameObject:
   - component: {fileID: 5048661504432237818}
   - component: {fileID: 5048661504432237819}
   - component: {fileID: 9158473654150187965}
+  - component: {fileID: 2820650407645485503}
   m_Layer: 8
   m_Name: Turtle
   m_TagString: Enemy
@@ -1235,6 +1236,18 @@ MonoBehaviour:
   player: {fileID: 0}
   animatorPlayer: {fileID: 0}
   dammagePlayer: 0
+--- !u!114 &2820650407645485503
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5050290968676056481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b3e60b1ce76146c47af2df88a89a22fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5050301763291445091
 GameObject:
   m_ObjectHideFlags: 0
