@@ -32,6 +32,16 @@ public class PlayerController : MonoBehaviour
     public GameObject[] cubeTests;
     public bool didFirstAttack = false;
 
+    public bool canLaunchSpecialAttack = false;
+    public bool launchSpecialAttack = false;
+
+    public Collider colToCheck;
+    public int actualDamageMultiplier;
+    int basedamageMultiplier = 1;
+    int boostedDamageMultiplier = 3;
+    int finalBoostedDamageMultiplier = 6;
+    float auraSwordDuration = 6f;
+
     void Start()
     {
         // Initialize values
@@ -46,20 +56,28 @@ public class PlayerController : MonoBehaviour
         swordAura.SetActive(false);
 
         // Weapon collider
-        attackHitbox[0] = GameObject.Find("ColliderWeapon").GetComponent<Collider>();
+        attackHitbox[0] = GameObject.Find("ColliderSword").GetComponent<Collider>();
+        attackHitbox[1] = GameObject.Find("ColliderSpecialSword").GetComponent<Collider>();
 
         // Set values
         speedForwardOnStart = speedForward;
         speedBackwardOnStart = speedBackward;
+        actualDamageMultiplier = basedamageMultiplier;
 
         // Temp
         foreach (GameObject go in cubeTests)
             go.SetActive(false);
 
+        // Set the collider to check on start
+        colToCheck = attackHitbox[0];
     }
 
     private void Update()
     {
+        // Cheat to remove
+        if (Input.GetKeyDown(KeyCode.Space))
+            playerCharacteristics.currentManaPlayer = 100;
+
         // Detect player inputs and send them to the animator
         UpdatePlayerInputs();
 
@@ -69,11 +87,17 @@ public class PlayerController : MonoBehaviour
         // Rotation
         UpdateRotation();
 
-        // Animator State
+        // Update the animator State
         UpdateAnimatorCurrentState();
 
         // Detect if the special attack should be used
         CheckForSpecialAttack();
+
+        // Update the attacks multipliers
+        UpdateAttackMultipler();
+
+        // Update the player speed
+        UpdateSpeed();
 
         // Detect left click mouse input to attack
         DetectMouseInputs();
@@ -108,6 +132,9 @@ public class PlayerController : MonoBehaviour
     private void UpdateAnimatorCurrentState()
     {
         currentState = (this.animatorPlayer.GetCurrentAnimatorClipInfo(0))[0].clip.name;
+
+        // Update specialAttack value
+        animatorPlayer.SetBool("launchSpecialAttack", launchSpecialAttack);
     }
 
     private void ResetAttackBools()
@@ -119,35 +146,12 @@ public class PlayerController : MonoBehaviour
                 canAttackRecover[i] = true;
         }
     }
-
-    private void CheckForSpecialAttack()
-    {
-        // Action when using final attack
-        if (animatorPlayer.GetCurrentAnimatorStateInfo(0).IsName("Attack04"))
-        {
-            // Appear sword aura
-            swordAura.SetActive(true);
-
-            // Reduce speed when the player is attacking
-            speedForward = 0;
-            speedBackward = 0;
-            Invoke("CameraShake", 0.4f);
-
-            //Need to appear only when mana == 100 for 1 total combo for exemple - ToDo
-        }
-        else
-        {
-            // Set the normal speed when the player is not attacking
-            speedForward = speedForwardOnStart;
-            speedBackward = speedBackwardOnStart;
-
-            // Disappear shield aura
-            swordAura.SetActive(false);
-        }
-    }
-
     private void DetectMouseInputs()
     {
+        // Right click mouse input to get the special sword
+        if (Input.GetMouseButton(1) && canLaunchSpecialAttack)
+            launchSpecialAttack = true;
+
         // Right click mouse input to defend
         if (Input.GetMouseButton(0))
         {
@@ -180,15 +184,91 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void UpdateAttackMultipler()
+    {
+        // Action when using final attack
+        if (currentState.Contains("Attack04") && launchSpecialAttack)
+        {
+            // Shake camera
+            Invoke("CameraShake", 0.4f);
+
+            // Update damage multiplier
+            actualDamageMultiplier = finalBoostedDamageMultiplier;
+        }
+        else if (launchSpecialAttack)
+            actualDamageMultiplier = boostedDamageMultiplier;
+        else
+            actualDamageMultiplier = basedamageMultiplier;
+    }
+
+    private void UpdateSpeed() 
+    {
+        if (currentState.Contains("Attack"))
+        {
+            slowPlayerSpeed(true, 0.5f);
+
+            if (actualDamageMultiplier == finalBoostedDamageMultiplier)
+                slowPlayerSpeed(true, 0f);
+        }
+        else
+            slowPlayerSpeed(false, 1f);
+    }
+
+    private void slowPlayerSpeed(bool shouldSlow, float multiplier)
+    {
+        if (shouldSlow)
+        {
+            // Reduce speed when the player is attacking
+            speedForward = speedForwardOnStart * multiplier;
+            speedBackward = speedBackwardOnStart * multiplier;
+        }
+        else
+        {
+            // Set the normal speed when the player is not attacking
+            speedForward = speedForwardOnStart;
+            speedBackward = speedBackwardOnStart;
+        }
+    }
+
+    private void CheckForSpecialAttack()
+    {
+        // Special attack activation
+        if (playerCharacteristics.currentManaPlayer == 100)
+            canLaunchSpecialAttack = true;
+
+        // Action when using final attack
+        if (launchSpecialAttack && canLaunchSpecialAttack)
+        {
+            canLaunchSpecialAttack = false;
+            playerCharacteristics.currentManaPlayer = 0;
+
+            // Appear sword aura
+            swordAura.SetActive(true);
+            colToCheck = attackHitbox[1];
+            //actualDamageMultiplier = boostedDamageMultiplier;
+
+            // Stop attack after timer
+            StartCoroutine(stopSpecialAttack(auraSwordDuration));
+        }
+    }
+
+    private IEnumerator stopSpecialAttack(float timer) 
+    {
+        yield return new WaitForSeconds(timer);
+        swordAura.SetActive(false);
+        launchSpecialAttack = false;
+        colToCheck = attackHitbox[0];
+        //actualDamageMultiplier = basedamageMultiplier;
+    }
+
     private void CheckDamageAndManaRecover()
     {
         for (int i = 0; i < canAttackRecover.Length; i++)
         {
             if (recordedState != currentState)
             {
-                if ((animatorPlayer.GetCurrentAnimatorStateInfo(0).IsName("Attack0" + (i + 1).ToString())
-                    && recordedState.Contains("Attack") && canAttackRecover[i])
-                    || ((!recordedState.Contains("Attack") || recordedState == "Attack04") && i == 0))
+                if ((currentState.Contains("Attack0" + (i + 1).ToString()) && recordedState.Contains("Attack") && canAttackRecover[i])
+                    || ((!recordedState.Contains("Attack") || recordedState.Contains("Attack04")) && i == 0))
                 {
                     CompleteAttack(i);
                 }
@@ -211,7 +291,7 @@ public class PlayerController : MonoBehaviour
         canAttackRecover[index] = false;
 
         // Deal attack damage
-        if (currentState == "Attack04")
+        if (currentState.Contains("Attack04") && launchSpecialAttack)
             Invoke("LaunchAttack", 0.35f);
         else
             Invoke("LaunchAttack", 0.05f);
@@ -226,22 +306,22 @@ public class PlayerController : MonoBehaviour
 
     private void LaunchAttack()
     {
-        // Get the collider to check
-        Collider colToCheck = attackHitbox[0];
-
         // Detect ennemies in range of attack
         Collider[] colliders = Physics.OverlapBox(colToCheck.bounds.center, colToCheck.bounds.extents, colToCheck.transform.rotation, LayerMask.GetMask("Enemy"));
 
         foreach (Collider collider in colliders)
         {
-            collider.GetComponent<EnemyCharacteristics>().TakeDamage(playerCharacteristics.damagePlayer);
+            collider.GetComponent<EnemyCharacteristics>().TakeDamage(playerCharacteristics.damagePlayer * actualDamageMultiplier);
+
+            if (launchSpecialAttack)
+                collider.GetComponent<Animator>().SetTrigger("getHit");
         }
     }
 
     private void RecoverMana()
     {
-        if (playerCharacteristics.currentManaPlayer < playerCharacteristics.maxManaPlayer)
-            if (playerCharacteristics.maxManaPlayer + playerCharacteristics.manaToRecover > playerCharacteristics.maxManaPlayer)
+        if (playerCharacteristics.currentManaPlayer < playerCharacteristics.maxManaPlayer && !launchSpecialAttack)
+            if (playerCharacteristics.currentManaPlayer + playerCharacteristics.manaToRecover <= playerCharacteristics.maxManaPlayer)
                 playerCharacteristics.currentManaPlayer += playerCharacteristics.manaToRecover;
             else
                 playerCharacteristics.currentManaPlayer = playerCharacteristics.maxManaPlayer;

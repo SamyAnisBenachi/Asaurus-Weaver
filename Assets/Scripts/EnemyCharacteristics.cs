@@ -20,7 +20,6 @@ public class EnemyCharacteristics : MonoBehaviour
     [Header("Player detection")]
     public GameObject player;
     public Animator animatorPlayer;
-    [SerializeField] int dammagePlayer;
 
     void Start()
     {
@@ -30,7 +29,6 @@ public class EnemyCharacteristics : MonoBehaviour
         currentHealthEnemy = maxHealthEnemy;
         animatorEnemy = this.GetComponent<Animator>();
         animatorPlayer = GameObject.Find("Player").GetComponent<Animator>();
-        dammagePlayer = player.GetComponent<PlayerCharacteristics>().damagePlayer;
     }
 
     void Update()
@@ -40,6 +38,7 @@ public class EnemyCharacteristics : MonoBehaviour
             // Update Health Bar value
             sliderHealthEnemy.value = currentHealthEnemy / maxHealthEnemy;
 
+            // Check for death
             if (currentHealthEnemy <= 0)
                 Die();
         }

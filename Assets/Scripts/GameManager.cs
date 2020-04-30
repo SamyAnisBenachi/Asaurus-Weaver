@@ -32,10 +32,12 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // Update UI
         xpBar.value = xpTotal / xpNextLevelUp;
         xpText.text = " XP : " + xpTotal.ToString() + " / " + xpNextLevelUp.ToString();
         levelText.text = actualLevel.ToString();
 
+        // Check for level up
         if (xpTotal >= xpNextLevelUp)
             LevelUp();
     }

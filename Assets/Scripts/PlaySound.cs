@@ -20,6 +20,11 @@ public class PlaySound : MonoBehaviour
     public AudioClip defendEffect;
     public AudioClip swordEffect;
 
+    void Start()
+    {
+        audioSource = this.GetComponent<AudioSource>();
+    }
+
     void SoundFootstepLeft()
     {
         if (footStepLeft)

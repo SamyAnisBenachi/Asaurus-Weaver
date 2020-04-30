@@ -10,6 +10,11 @@ public class PlaySoundEnemy : MonoBehaviour
     public AudioClip getHit;
     public AudioClip die;
 
+    void Start()
+    {
+        audioSource = this.GetComponent<AudioSource>();
+    }
+
     void SoundAttack1()
     {
         if (attack)

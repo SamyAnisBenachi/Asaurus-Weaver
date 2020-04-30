@@ -11,7 +11,7 @@ public class PlayerCharacteristics : MonoBehaviour
     [Range(1, 500)] public float maxManaPlayer = 100;
     public float currentManaPlayer;
     [Range(0, 50)] public int damagePlayer = 5;
-    [Range(0, 50)] public int manaToRecover = 5;
+    [Range(0, 50)] public int manaToRecover = 15;
     public bool isDead = false;
 
     [Header("User Interface")]
@@ -19,6 +19,7 @@ public class PlayerCharacteristics : MonoBehaviour
     public TextMeshProUGUI hpText;
     public Slider manaBar;
     public TextMeshProUGUI manaText;
+    public Animator manaAnimation;
 
     void Start()
     {
@@ -28,6 +29,7 @@ public class PlayerCharacteristics : MonoBehaviour
         hpText = GameObject.Find("HpText").GetComponent<TextMeshProUGUI>();
         manaBar = GameObject.Find("ManaSlider").GetComponent<Slider>();
         manaText = GameObject.Find("ManaText").GetComponent<TextMeshProUGUI>();
+        manaAnimation = GameObject.Find("FillMana").GetComponent<Animator>();
 
         // Set values
         currentHealthPlayer = maxHealthPlayer;
@@ -47,7 +49,12 @@ public class PlayerCharacteristics : MonoBehaviour
         if (currentHealthPlayer <= 0)
             isDead = true;
 
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (currentManaPlayer == maxManaPlayer)
+            manaAnimation.SetBool("maximumMana", true);
+        else
+            manaAnimation.SetBool("maximumMana", false);
+
+        if (Input.GetKeyDown(KeyCode.Space))
             StartCoroutine(DecreaseHP(1000));
     }
 
