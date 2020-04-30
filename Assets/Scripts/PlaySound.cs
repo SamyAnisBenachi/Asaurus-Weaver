@@ -28,42 +28,42 @@ public class PlaySound : MonoBehaviour
     void SoundFootstepLeft()
     {
         if (footStepLeft)
-            audioSource.PlayOneShot(footStepLeft, 0.1f);
+            audioSource.PlayOneShot(footStepLeft, 0.3f);
         Debug.Log("SoundFootstepLeft");
     }
 
     void SoundFootstepRight()
     {
         if (footStepRight)
-            audioSource.PlayOneShot(footStepRight, 0.1f);
+            audioSource.PlayOneShot(footStepRight, 0.3f);
         Debug.Log("SoundFootstepRight");
     }
 
     void SoundAttack1()
     {
         if (attack1)
-            audioSource.PlayOneShot(attack1, 1f);
+            audioSource.PlayOneShot(attack1, 0.7f);
         Debug.Log("SoundAttack1");
     }
 
     void SoundAttack2()
     {
         if (attack2)
-            audioSource.PlayOneShot(attack2, 1f);
+            audioSource.PlayOneShot(attack2, 0.7f);
         Debug.Log("SoundAttack2");
     }
 
     void SoundAttack3()
     {
         if (attack3)
-            audioSource.PlayOneShot(attack3, 1f);
+            audioSource.PlayOneShot(attack3, 0.7f);
         Debug.Log("SoundAttack3");
     }
 
     void SoundAttack4()
     {
         if (attack4)
-            audioSource.PlayOneShot(attack4, 1f);
+            audioSource.PlayOneShot(attack4, 0.7f);
         Debug.Log("PlayOneShot");
     }
 
