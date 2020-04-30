@@ -314,7 +314,7 @@ public class PlayerController : MonoBehaviour
             collider.GetComponent<EnemyCharacteristics>().TakeDamage(playerCharacteristics.damagePlayer * actualDamageMultiplier);
 
             if (launchSpecialAttack)
-                collider.GetComponent<Animator>().SetTrigger("getHit");
+                collider.GetComponent<Animator>().SetTrigger("getHit"); 
         }
     }
 
