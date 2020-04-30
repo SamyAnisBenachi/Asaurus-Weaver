@@ -16,7 +16,8 @@ public class PlaySound : MonoBehaviour
     public AudioClip attack2;
     public AudioClip attack3;
     public AudioClip attack4;
-    public AudioClip attackHit;
+    public AudioClip[] attackHit;
+    public int hitIndex = 0;
 
     public AudioClip defendEffect;
     public AudioClip swordEffect;
@@ -77,9 +78,12 @@ public class PlaySound : MonoBehaviour
 
     void SoundAttackHit()
     {
-        if (attackHit && playerController.touchedEnemy)
+        if (attackHit != null && playerController.touchedEnemy)
         {
-            audioSource.PlayOneShot(attackHit, 0.5f);
+            audioSource.PlayOneShot(attackHit[hitIndex], 0.2f);
+            hitIndex++;
+            if (hitIndex > attackHit.Length - 1)
+                hitIndex = 0;
             playerController.touchedEnemy = false;
         }
     }
