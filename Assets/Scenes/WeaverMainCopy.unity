@@ -9322,7 +9322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animatorPlayer: {fileID: 0}
   playerCharacteristics: {fileID: 0}
-  speedForward: 50
+  speedForward: 15
   speedBackward: 5
   speedRotation: 100
   shieldAura: {fileID: 0}
