@@ -9343,6 +9343,8 @@ MonoBehaviour:
   launchSpecialAttack: 0
   colToCheck: {fileID: 0}
   actualDamageMultiplier: 0
+  audioHit: {fileID: 0}
+  touchedEnemy: 0
 --- !u!136 &708174266
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -9394,8 +9396,10 @@ MonoBehaviour:
   attack2: {fileID: 8300000, guid: 3db908292ec259041b9fef5b9804cd35, type: 3}
   attack3: {fileID: 8300000, guid: 6364ec767fac6384996ec619f4818838, type: 3}
   attack4: {fileID: 8300000, guid: 9e3dcbad5babca649b93f421c4a774ac, type: 3}
+  attackHit: {fileID: 8300000, guid: 32cdec7bf06862140837cc6797fe3446, type: 3}
   defendEffect: {fileID: 0}
   swordEffect: {fileID: 8300000, guid: a88d36fc127756f4794d22c7b5335716, type: 3}
+  playerController: {fileID: 0}
 --- !u!114 &708174269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17647,10 +17651,10 @@ Transform:
   - {fileID: 735478921}
   - {fileID: 1340690935}
   - {fileID: 2050724174}
-  - {fileID: 585787342}
   - {fileID: 1686291091}
-  - {fileID: 1939513380}
+  - {fileID: 585787342}
   - {fileID: 225092515}
+  - {fileID: 1939513380}
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

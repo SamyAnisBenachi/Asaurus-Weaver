@@ -16,13 +16,17 @@ public class PlaySound : MonoBehaviour
     public AudioClip attack2;
     public AudioClip attack3;
     public AudioClip attack4;
+    public AudioClip attackHit;
 
     public AudioClip defendEffect;
     public AudioClip swordEffect;
 
+    public PlayerController playerController;
+
     void Start()
     {
         audioSource = this.GetComponent<AudioSource>();
+        playerController = this.GetComponent<PlayerController>();
     }
 
     void SoundFootstepLeft()
@@ -43,6 +47,7 @@ public class PlaySound : MonoBehaviour
     {
         if (attack1)
             audioSource.PlayOneShot(attack1, 0.7f);
+        SoundAttackHit();
         Debug.Log("SoundAttack1");
     }
 
@@ -50,6 +55,7 @@ public class PlaySound : MonoBehaviour
     {
         if (attack2)
             audioSource.PlayOneShot(attack2, 0.7f);
+        SoundAttackHit();
         Debug.Log("SoundAttack2");
     }
 
@@ -57,6 +63,7 @@ public class PlaySound : MonoBehaviour
     {
         if (attack3)
             audioSource.PlayOneShot(attack3, 0.7f);
+        SoundAttackHit();
         Debug.Log("SoundAttack3");
     }
 
@@ -64,7 +71,17 @@ public class PlaySound : MonoBehaviour
     {
         if (attack4)
             audioSource.PlayOneShot(attack4, 0.7f);
+        SoundAttackHit();
         Debug.Log("PlayOneShot");
+    }
+
+    void SoundAttackHit()
+    {
+        if (attackHit && playerController.touchedEnemy)
+        {
+            audioSource.PlayOneShot(attackHit, 0.5f);
+            playerController.touchedEnemy = false;
+        }
     }
 
     void SoundAuraShield()

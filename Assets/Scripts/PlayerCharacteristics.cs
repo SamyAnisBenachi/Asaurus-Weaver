@@ -76,4 +76,14 @@ public class PlayerCharacteristics : MonoBehaviour
             yield return new WaitForSeconds(0.001f);
         }
     }
+
+    public IEnumerator DecreaseMana(int manaReduced)
+    {
+        for (int i = 0; i < manaReduced; i++)
+        {
+            if(currentManaPlayer > 0)
+                currentManaPlayer--;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
 }

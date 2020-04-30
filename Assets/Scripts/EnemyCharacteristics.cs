@@ -53,6 +53,9 @@ public class EnemyCharacteristics : MonoBehaviour
     {
         isDead = true;
 
+        // Change layer mask to don't get hit anymore
+        this.gameObject.layer = 0;
+
         // Set dead animation
         animatorEnemy.SetTrigger("isDead");
 

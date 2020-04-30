@@ -42,6 +42,9 @@ public class PlayerController : MonoBehaviour
     int finalBoostedDamageMultiplier = 6;
     float auraSwordDuration = 6f;
 
+    public AudioSource audioHit;
+    public bool touchedEnemy = false;
+
     void Start()
     {
         // Initialize values
@@ -171,8 +174,9 @@ public class PlayerController : MonoBehaviour
             // Appear shield aura
             shieldAura.SetActive(true);
 
-            // Consume player mana when shielding
-            playerCharacteristics.currentManaPlayer--;
+            // Consume player mana when shielding, not consumed if auraSword activated
+            if(!launchSpecialAttack)
+                playerCharacteristics.currentManaPlayer--;
         }
         else
         {
@@ -240,25 +244,26 @@ public class PlayerController : MonoBehaviour
         if (launchSpecialAttack && canLaunchSpecialAttack)
         {
             canLaunchSpecialAttack = false;
-            playerCharacteristics.currentManaPlayer = 0;
+            StartCoroutine(playerCharacteristics.DecreaseMana(100));
 
             // Appear sword aura
             swordAura.SetActive(true);
             colToCheck = attackHitbox[1];
-            //actualDamageMultiplier = boostedDamageMultiplier;
 
             // Stop attack after timer
-            StartCoroutine(stopSpecialAttack(auraSwordDuration));
+            //StartCoroutine(stopSpecialAttack(auraSwordDuration));
         }
+
+        if(launchSpecialAttack && playerCharacteristics.currentManaPlayer == 0)
+            StartCoroutine(stopSpecialAttack(auraSwordDuration)); //mettre une fonction normal todo
     }
 
     private IEnumerator stopSpecialAttack(float timer) 
     {
-        yield return new WaitForSeconds(timer);
+        yield return new WaitForSeconds(0f);
         swordAura.SetActive(false);
         launchSpecialAttack = false;
         colToCheck = attackHitbox[0];
-        //actualDamageMultiplier = basedamageMultiplier;
     }
 
     private void CheckDamageAndManaRecover()
@@ -297,7 +302,7 @@ public class PlayerController : MonoBehaviour
             Invoke("LaunchAttack", 0.05f);
 
         // Recover mana
-        Invoke("RecoverMana", 0.05f);
+        //Invoke("RecoverMana", 0.05f);
 
         // Visual display to remove
         cubeTests[index].SetActive(true);
@@ -311,10 +316,18 @@ public class PlayerController : MonoBehaviour
 
         foreach (Collider collider in colliders)
         {
+            // Recover Mana
+            if (!touchedEnemy)
+                RecoverMana();
+
+            // With this variable to false, the player won't recover mana for each enemy touched, and same for the hitAttackSound
+            touchedEnemy = true;
+
+            // Deal damage
             collider.GetComponent<EnemyCharacteristics>().TakeDamage(playerCharacteristics.damagePlayer * actualDamageMultiplier);
 
             if (launchSpecialAttack)
-                collider.GetComponent<Animator>().SetTrigger("getHit"); 
+                collider.GetComponent<Animator>().SetTrigger("getHit");
         }
     }
 
