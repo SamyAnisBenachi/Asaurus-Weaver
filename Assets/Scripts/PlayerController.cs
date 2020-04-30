@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using EZCameraShake;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -45,6 +46,7 @@ public class PlayerController : MonoBehaviour
     public AudioSource audioHit;
     public bool touchedEnemy = false;
 
+    public GameObject floatingDamage;
     void Start()
     {
         // Initialize values
@@ -309,6 +311,18 @@ public class PlayerController : MonoBehaviour
         StartCoroutine(closeCube(index));
     }
 
+    private void RecoverMana()
+    {
+        if (playerCharacteristics.currentManaPlayer < playerCharacteristics.maxManaPlayer && !launchSpecialAttack)
+            if (playerCharacteristics.currentManaPlayer + playerCharacteristics.manaToRecover <= playerCharacteristics.maxManaPlayer)
+                playerCharacteristics.currentManaPlayer += playerCharacteristics.manaToRecover;
+            else
+                playerCharacteristics.currentManaPlayer = playerCharacteristics.maxManaPlayer;
+
+        // Need to consider the fact that it should only regen when it its an enemy - ToDo
+    }
+
+
     private void LaunchAttack()
     {
         // Detect ennemies in range of attack
@@ -324,24 +338,43 @@ public class PlayerController : MonoBehaviour
             touchedEnemy = true;
 
             // Deal damage
-            collider.GetComponent<EnemyCharacteristics>().TakeDamage(playerCharacteristics.damagePlayer * actualDamageMultiplier);
+            //collider.GetComponent<EnemyCharacteristics>().TakeDamage(playerCharacteristics.damagePlayer * actualDamageMultiplier);
+            DealDamage(collider, playerCharacteristics.damagePlayer * actualDamageMultiplier);
 
             if (launchSpecialAttack)
                 collider.GetComponent<Animator>().SetTrigger("getHit");
         }
     }
 
-    private void RecoverMana()
+    private void DealDamage(Collider collider, int damage)
     {
-        if (playerCharacteristics.currentManaPlayer < playerCharacteristics.maxManaPlayer && !launchSpecialAttack)
-            if (playerCharacteristics.currentManaPlayer + playerCharacteristics.manaToRecover <= playerCharacteristics.maxManaPlayer)
-                playerCharacteristics.currentManaPlayer += playerCharacteristics.manaToRecover;
-            else
-                playerCharacteristics.currentManaPlayer = playerCharacteristics.maxManaPlayer;
+        collider.GetComponent<EnemyCharacteristics>().TakeDamage(damage);
 
-        // Need to consider the fact that it should only regen when it its an enemy - ToDo
+        GameObject popup = Instantiate(floatingDamage, collider.transform.Find("Canvas"));
+        TextMeshProUGUI textMesh = popup.GetComponent<TextMeshProUGUI>();
+        textMesh.text = damage.ToString();
+
+        textMesh.color = Color.yellow;
+        if (damage >= 30)
+            textMesh.color = Color.red;
+        else if (damage >= 15)
+            textMesh.color = Color.gray;
+
+        StartCoroutine(disappearDamagePopup(textMesh, textMesh.color, 1f, 3f));
     }
-  
+
+    private IEnumerator disappearDamagePopup(TextMeshProUGUI textMesh, Color color, float disappearTimer, float disappearSpeed)
+    {
+        while(textMesh.color.a > 0)
+        {
+            //color.a -= disappearSpeed * Time.deltaTime;
+            color.a -= 0.1f;
+
+            textMesh.color = color;
+            yield return new WaitForSeconds(0.1f);
+        }
+    }
+ 
     private void CameraShake()
     {
         CameraShaker.Instance.ShakeOnce(10f, 0.1f, 0.1f, 0.1f);
